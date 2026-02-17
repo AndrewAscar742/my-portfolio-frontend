@@ -1,0 +1,31 @@
+@startuml
+title Deploy Arquitetura - Angular Portfolio (CSR)
+
+actor Developer
+actor User
+
+rectangle "GitHub Repository" {
+  component "Source Code\nAngular 19 CSR"
+}
+
+rectangle "Cloudflare Pages" {
+  component "Build Worker\nnpm ci + ng build"
+  component "Static Artifacts\n(dist/browser)"
+}
+
+cloud "Cloudflare Edge CDN" {
+  component "Global Cache"
+  component "HTTPS + HTTP/2"
+  component "SPA Routing Fallback"
+}
+
+Developer --> "Source Code\nAngular 19 CSR" : git push
+
+"Source Code\nAngular 19 CSR" --> "Build Worker\nnpm ci + ng build" : webhook trigger
+"Build Worker\nnpm ci + ng build" --> "Static Artifacts\n(dist/browser)" : build output
+"Static Artifacts\n(dist/browser)" --> "Global Cache" : publish
+
+User --> "Global Cache" : HTTPS Request
+"Global Cache" --> User : Static files (HTML, JS, CSS)
+
+@enduml
